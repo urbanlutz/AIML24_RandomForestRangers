@@ -1,0 +1,9 @@
+data_root : ./data/
+data_set : country211
+batch_size : 256
+model : vit_b_16
+run_id : lemur_nodes1_devices2_batch256
+early_stopping_patience : 5
+devices : 2
+num_nodes : 1
+learning_rate : 0.00005

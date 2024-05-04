@@ -1,0 +1,8 @@
+data_root : ./data/
+data_set : EuroSAT_RGB
+batch_size : 128
+model : vit_b_16
+run_id : eurosat_alpha
+early_stopping_patience : 5
+devices : 1
+learning_rate : 0.0001
