@@ -15,13 +15,14 @@ import rasterio as rio
 from rasterio.plot import reshape_as_image
 
 def load_img(img_path:str) -> np.ndarray:
-  if img_path.split('.')[-1] == "tif":
-    with rio.open(img_path, "r") as d:
-      img = d.read([1,2,3,4,5,6,7,8,9,10,11,12,13])
-      img = reshape_as_image(img)
-  else:
-    img = np.load(img_path)
-  return img.astype("int16")
+    if img_path.split('.')[-1] == "tif":
+        with rio.open(img_path, "r") as d:
+            img = d.read([1,2,3,4,5,6,7,8,9,10,11,12,13])
+            img = reshape_as_image(img)
+    else:
+        img = np.load(img_path)
+    return img.astype("int16")
+
 
 # TODO: improvement -> find global max / min
 def l2a_approx(img):
