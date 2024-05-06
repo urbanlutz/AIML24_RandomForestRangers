@@ -5,15 +5,14 @@ import sys
 import yaml
 import lightning as L
 
-sys.path.append('./src/')
-from country211_module import Country211DataModule
-from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
+sys.path.append('./pretrained/src/')
+from eurosat_module import SentinelTest
 from vision_transformer import VisionTransformerPretrained
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
-with open('./configs/default.yaml') as cf_file:
-        config = yaml.safe_load(cf_file.read())
+with open('./pretrained/configs/default.yaml', encoding="utf-8") as cf_file:
+    config = yaml.safe_load(cf_file.read())
 
 
 
@@ -27,7 +26,7 @@ with open('./configs/default.yaml') as cf_file:
 
 
 
-path_to_data = "../drive/MyDrive/AIML24/testset/testset/testset"
+path_to_data = "./drive/MyDrive/AIML24/testset/testset/testset"
 test_dataset = SentinelTest(path_to_data, config['batch_size'])
 test_dataloader = test_dataset.test_dataloader()
 
@@ -38,22 +37,29 @@ model = VisionTransformerPretrained(
 
 early_stopping = EarlyStopping(monitor='valid_acc', patience=config['early_stopping_patience'], mode='max')
 
-logger = TensorBoardLogger("tensorboard_logs", name=config['run_id'])
+logger = TensorBoardLogger("pretrained/tensorboard_logs", name=config['run_id'])
 
-trainer = L.Trainer(max_epochs=config['max_epochs'],
-                        devices=config['devices'], 
+trainer = L.Trainer( max_epochs=config['max_epochs'],
+                        devices=config['devices'],
                         num_nodes=config['num_nodes'],
                         strategy='ddp',
-                        callbacks=[early_stopping], 
+                        callbacks=[early_stopping],
                         logger=logger,
-                        enable_progress_bar=False)
+                        enable_progress_bar=True)
 
-chkpt_path = "tensorboard_logs/alpha/version_1/checkpoints/epoch=14-step=2955.ckpt"
+chkpt_path = "pretrained/tensorboard_logs/alpha/version_1/checkpoints/epoch=14-step=2955.ckpt"
 
 # trainer.fit(model, ckpt_path=chkpt_path)
-trainer.predict(model=model, dataloaders=test_dataloader, ckpt_path=chkpt_path)
-# disable randomness, dropout, etc...
-model.eval()
 
-# predict with the model
-y_hat = model(x)
+preds = trainer.predict(model=model, dataloaders=test_dataloader, ckpt_path=chkpt_path)
+print(preds)
+
+
+import pickle
+with open('model_output.pkl', 'wb') as f:
+    pickle.dump(preds, f)
+# disable randomness, dropout, etc...
+# model.eval()
+
+# # predict with the model
+# y_hat = model(x)
