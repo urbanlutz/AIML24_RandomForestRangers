@@ -1,6 +1,0 @@
-.venv
-submit.sh
-slurm*
-tensorboard_logs/
-data/
-src/__pycache__/
