@@ -5,3 +5,4 @@ __pycache__/
 *.py[cod]
 *.pt
 core.*
+pretrained/tensorboard_logs/*
