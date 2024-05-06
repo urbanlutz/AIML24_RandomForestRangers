@@ -1,11 +1,15 @@
 #!/usr/bin/python
-
+import sys
 import torch
 from torch.nn import functional as F
 from torch import optim
 
 from transformers import ViTForImageClassification
 import torchmetrics
+
+sys.path.append('./src/')
+from country211_module import Country211DataModule
+from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
 
 
 import lightning as L
@@ -78,3 +82,10 @@ class VisionTransformerPretrained(L.LightningModule):
     def configure_optimizers(self):
         optimizer = optim.Adam(self.parameters(), lr=self.learning_rate)
         return optimizer
+
+    def train_dataloader(self):
+        # Return your dataloader here
+        path_to_data = "../drive/MyDrive/AIML24/testset/testset/testset"
+        test_dataset = SentinelTest(path_to_data, 2)
+        test_dataloader = test_dataset.test_dataloader()
+        return test_dataloader

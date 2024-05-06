@@ -3,6 +3,7 @@
 import torch
 import numpy as np
 import os
+import glob
 
 from sklearn.model_selection import train_test_split
 
@@ -21,7 +22,7 @@ def load_img(img_path:str) -> np.ndarray:
             img = reshape_as_image(img)
     else:
         img = np.load(img_path)
-    return img.astype("int16")
+    return img.astype("float32")
 
 
 # TODO: improvement -> find global max / min
@@ -107,3 +108,38 @@ class EuroSAT_RGB_DataModule(L.LightningDataModule):
 
     def test_dataloader(self):
         return DataLoader(dataset=self.test_data, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)
+        
+def get_id(img_path):
+    return img_path.split("/")[-1].split("_")[-1].split(".")[0]
+
+class SentinelTest():
+
+    def __init__(self, data_root, batch_size, transformations=None):
+        self.img_paths = [path.replace("\\","/") for path in glob.glob(os.path.join(data_root,  f"*.npy"))]
+        self.transformations = transformations
+        self.current_index = 0
+        self.batch_size = batch_size
+        self.num_workers = 8
+        
+    def __len__(self):
+        return len(self.img_paths)
+
+    def __getitem__(self, idx):
+        img_path = self.img_paths[idx]
+        image = load_img(img_path).astype(np.float32)
+        image_id = get_id(img_path)
+
+        if self.transformations:
+            image = self.transformations(image)
+        return image, image_id
+
+    def __next__(self):
+        image, image_id = self.__getitem__(self.current_index)
+        self.current_index += 1
+        return image
+
+    def __iter__(self):
+        return self
+
+    def test_dataloader(self):
+        return DataLoader(dataset=self, batch_size=self.batch_size, num_workers=self.num_workers, shuffle=False)

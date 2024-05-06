@@ -75,7 +75,7 @@ def main(arg):
                         strategy='ddp',
                         callbacks=[early_stopping], 
                         logger=logger,
-                        enable_progress_bar=False)
+                        enable_progress_bar=True)
     trainer.fit(model=model, train_dataloaders=train_dataloader, val_dataloaders=valid_dataloader)
 
     # test
