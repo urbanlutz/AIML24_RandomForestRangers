@@ -6,3 +6,4 @@ __pycache__/
 *.pt
 core.*
 pretrained/tensorboard_logs/*
+*/.ipynb_checkpoints/*
