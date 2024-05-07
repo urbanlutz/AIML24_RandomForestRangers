@@ -10,7 +10,16 @@ from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
 from vision_transformer import VisionTransformerPretrained
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
-
+import sys
+import torch
+import yaml
+import lightning as L
+import numpy as np
+sys.path.append('./pretrained/src/')
+from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
+from vision_transformer import VisionTransformerPretrained
+from lightning.pytorch.callbacks.early_stopping import EarlyStopping
+from lightning.pytorch.loggers import TensorBoardLogger
 with open('./pretrained/configs/default.yaml', encoding="utf-8") as cf_file:
     config = yaml.safe_load(cf_file.read())
 
@@ -23,7 +32,7 @@ datamodule.setup()
 
 
 
-test_dataset = SentinelTest(config["test_data_path"], config['batch_size'])
+test_dataset = SentinelTest(config["test_data_path"], 2)
 test_dataloader = test_dataset.test_dataloader()
 
 # TODO: try https://pytorch-lightning.readthedocs.io/en/1.6.5/common/checkpointing.html#restoring-training-state
@@ -36,32 +45,24 @@ early_stopping = EarlyStopping(monitor='valid_acc', patience=config['early_stopp
 logger = TensorBoardLogger("pretrained/tensorboard_logs", name=config['run_id'])
 
 trainer = L.Trainer( max_epochs=config['max_epochs'],
-                        devices=config['devices'],
+                        devices=1,
                         num_nodes=config['num_nodes'],
                         strategy='ddp',
                         callbacks=[early_stopping],
                         logger=logger,
                         enable_progress_bar=True)
 
-chkpt_path = "pretrained/tensorboard_logs/alpha/version_10/checkpoints/epoch=27-step=5516.ckpt"
+chkpt_path = "pretrained/tensorboard_logs/alpha/version_36/checkpoints/epoch=7-step=1576.ckpt"
 
 # trainer.fit(model, ckpt_path=chkpt_path)
 
 preds = trainer.predict(model=model, dataloaders=test_dataloader, ckpt_path=chkpt_path)
 
+print(f"len preds {len(preds)}")
 # import os
 # os.chdir("pretrained-vision-transformer")
 
-import sys
-import torch
-import yaml
-import lightning as L
-import numpy as np
-sys.path.append('./pretrained/src/')
-from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
-from vision_transformer import VisionTransformerPretrained
-from lightning.pytorch.callbacks.early_stopping import EarlyStopping
-from lightning.pytorch.loggers import TensorBoardLogger
+
 
 # with open('./pretrained/configs/default.yaml', encoding="utf-8") as cf_file:
 #     config = yaml.safe_load(cf_file.read())
