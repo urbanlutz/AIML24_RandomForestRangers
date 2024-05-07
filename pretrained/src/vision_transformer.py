@@ -43,7 +43,10 @@ class VisionTransformerPretrained(L.LightningModule):
         self.learning_rate = learning_rate
 
     def forward(self, x):
-        return self.backbone(x)
+        try:
+            return self.backbone(x)
+        except:
+            return self.backbone(x[0]), x[1]
 
     def step(self, batch):
        '''

@@ -75,7 +75,7 @@ test_transforms  = transforms.Compose([
 
 class EuroSAT_RGB_DataModule(L.LightningDataModule):
     '''
-    Lightning datamodule for the Country211 dataset
+    Lightning datamodule for the EuroSAT dataset
 
     '''
 
@@ -175,7 +175,7 @@ class SentinelTest():
 
         if self.transformations:
             image = self.transformations(image)
-        return image
+        return image, image_id
 
     def __next__(self):
         image, image_id = self.__getitem__(self.current_index)
