@@ -60,7 +60,7 @@ def color_jitter(x):
     pre = x[0, :, :].unsqueeze(0)
     jittered = transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1))(x[[1,2,3], : , :])
     post = x[4:, : ,:]
-    torch.cat((pre, jittered, post), 0)
+    return torch.cat((pre, jittered, post), 0)
 
 train_transforms  = transforms.Compose([
     l2a_approx,
