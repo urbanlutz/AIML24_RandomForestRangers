@@ -55,7 +55,12 @@ test_std = [115.1743, 209.1482, 241.2069, 301.1053, 269.5137, 420.2494, 503.8187
 # test_std = [301.1053,241.2069, 209.1482]
 
 
-
+def color_jitter(x):
+    # jitter rgb bands only (order doesn't matter)
+    pre = x[0, :, :].unsqueeze(0)
+    jittered = transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1))(x[[1,2,3], : , :])
+    post = x[4:, : ,:]
+    torch.cat((pre, jittered, post), 0)
 
 train_transforms  = transforms.Compose([
     l2a_approx,
@@ -64,7 +69,7 @@ train_transforms  = transforms.Compose([
     v2.Resize(size=(224,224), interpolation=2, antialias=True),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
-    transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1)),
+    color_jitter,
     transforms.GaussianBlur(1),
 ])
 test_transforms  = transforms.Compose([
