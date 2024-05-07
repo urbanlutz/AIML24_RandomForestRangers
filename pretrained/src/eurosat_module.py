@@ -64,6 +64,7 @@ train_transforms  = transforms.Compose([
     v2.Resize(size=(224,224), interpolation=2, antialias=True),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
+    transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1)),
     transforms.GaussianBlur(1),
 ])
 test_transforms  = transforms.Compose([
@@ -89,7 +90,7 @@ class EuroSAT_RGB_DataModule(L.LightningDataModule):
         self.data_root = data_root
         self.batch_size = batch_size
 
-        self.num_workers = 8
+        self.num_workers = 2
         self.valid_size = valid_size
 
     @property
