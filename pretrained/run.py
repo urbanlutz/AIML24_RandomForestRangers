@@ -82,6 +82,7 @@ def main(arg):
     print('Starting model test')
     trainer.test(model=model, dataloaders=test_dataloader, verbose=True)
     print('Finished model test')
+    
 
 if __name__=='__main__':
     main(sys.argv[1:])

@@ -154,7 +154,7 @@ class SentinelTest():
         self.img_paths = [path.replace("\\","/") for path in glob.glob(os.path.join(data_root,  f"*.npy"))]
         self.transformations = test_transforms
         self.current_index = 0
-        self.batch_size = batch_size
+    
         self.num_workers = 8
         
     def __len__(self):
@@ -178,4 +178,5 @@ class SentinelTest():
         return self
 
     def test_dataloader(self):
-        return DataLoader(dataset=self, batch_size=2, num_workers=self.num_workers, shuffle=False)
+        print(len(self.img_paths))
+        return DataLoader(dataset=self, batch_size=2, num_workers=1, shuffle=False)
