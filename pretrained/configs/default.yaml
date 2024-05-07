@@ -1,5 +1,7 @@
-data_root : ../drive/MyDrive/AIML24/remote_sensing/otherDatasets/sentinel_2
+data_root : ./drive/MyDrive/AIML24/remote_sensing/otherDatasets/sentinel_2/tif
 data_set : tif
+train_data_path: ./drive/MyDrive/AIML24/remote_sensing/otherDatasets/sentinel_2/tif
+test_data_path: ./drive/MyDrive/AIML24/testset/testset/testset
 batch_size : 32
 model : vit_b_16
 run_id : alpha
