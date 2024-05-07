@@ -41,14 +41,18 @@ def bandselect(img):
     return img[:, :, [3,2,1]]
 
 
-train_mean = [1353.7283, 1117.2009, 1041.8888,  946.5547, 1199.1866, 2003.0106,
-        2374.0134, 2301.2244, 2599.7827,  732.1823, 1820.6930, 1118.2052]
-train_std = [ 65.2964, 153.7740, 187.6989, 278.1234, 227.9242, 355.9332, 455.1324,
-        530.7811, 502.1637,  98.9300, 378.1612, 303.1070]
-test_mean = [380.1732,  400.1498,  628.8646,  578.8707,  943.4276, 1826.2419,
-        2116.6646, 2205.9729, 2281.1836, 2266.9331, 1487.6902,  959.2352]
-test_std = [115.1743, 209.1482, 241.2069, 301.1053, 269.5137, 420.2494, 503.8187,
-        598.0409, 529.4133, 403.9382, 398.1438, 342.4408]
+# train_mean = [1353.7283, 1117.2009, 1041.8888,  946.5547, 1199.1866, 2003.0106,
+#         2374.0134, 2301.2244, 2599.7827,  732.1823, 1820.6930, 1118.2052]
+# train_std = [ 65.2964, 153.7740, 187.6989, 278.1234, 227.9242, 355.9332, 455.1324,
+#         530.7811, 502.1637,  98.9300, 378.1612, 303.1070]
+# test_mean = [380.1732,  400.1498,  628.8646,  578.8707,  943.4276, 1826.2419,
+#         2116.6646, 2205.9729, 2281.1836, 2266.9331, 1487.6902,  959.2352]
+# test_std = [115.1743, 209.1482, 241.2069, 301.1053, 269.5137, 420.2494, 503.8187,
+#         598.0409, 529.4133, 403.9382, 398.1438, 342.4408]
+train_mean = [946.5547, 1041.8888, 1117.2009]
+train_std = [278.1234,187.6989, 153.7740]
+test_mean = [ 578.8707,628.8646, 400.1498]
+test_std = [301.1053,241.2069, 209.1482]
 
 
 
@@ -112,13 +116,7 @@ class EuroSAT_RGB_DataModule(L.LightningDataModule):
         # - scale to [0,1] and transform to float32
         # - normalize with ViT mean/std
 
-        transforms = v2.Compose([l2a_approx,
-                                 bandselect,
-                                 v2.ToImage(),
-                                 v2.Resize(size=(224,224), interpolation=2, antialias=True),
-                                 v2.ToDtype(torch.float32, scale=True),
-                                 v2.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-                                ])
+        transforms = train_transforms
 
         data = ImageFolder(self.data_root, transform=transforms, loader=load_img)
         targets = np.asarray(data.targets)
@@ -154,13 +152,7 @@ class SentinelTest():
 
     def __init__(self, data_root, batch_size, transformations=None):
         self.img_paths = [path.replace("\\","/") for path in glob.glob(os.path.join(data_root,  f"*.npy"))]
-        self.transformations = v2.Compose([
-                                 bandselect,
-                                 v2.ToImage(),
-                                 v2.Resize(size=(224,224), interpolation=2, antialias=True),
-                                 v2.ToDtype(torch.float32, scale=True),
-                                 v2.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
-                                ])
+        self.transformations = test_transforms
         self.current_index = 0
         self.batch_size = batch_size
         self.num_workers = 8

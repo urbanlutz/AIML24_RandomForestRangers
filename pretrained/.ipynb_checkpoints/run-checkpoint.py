@@ -11,7 +11,7 @@ import lightning as L
 from lightning.pytorch.callbacks.early_stopping import EarlyStopping
 from lightning.pytorch.loggers import TensorBoardLogger
 
-sys.path.append('./src/')
+sys.path.append('./pretrained/src/')
 from country211_module import Country211DataModule
 from eurosat_module import EuroSAT_RGB_DataModule
 from vision_transformer import VisionTransformerPretrained
@@ -23,7 +23,7 @@ def main(arg):
     L.seed_everything(1312)
     print('Seeed everything')
 
-    with open('./configs/default.yaml') as cf_file:
+    with open('./pretrained/configs/default.yaml') as cf_file:
         default_config = yaml.safe_load(cf_file.read())
 
     if len(arg) == 1:
@@ -45,7 +45,7 @@ def main(arg):
         datamodule = Country211DataModule(config['data_root'], config['batch_size'])
     elif config['data_set'] == 'tif':
         # setup data
-        path_to_data = os.path.join(config['data_root'], config['data_set'])
+        path_to_data = config['data_root']
         datamodule = EuroSAT_RGB_DataModule(path_to_data, config['batch_size'], config['valid_size'])
         datamodule.prepare_data()
 
@@ -66,7 +66,7 @@ def main(arg):
     early_stopping = EarlyStopping(monitor='valid_acc', patience=config['early_stopping_patience'], mode='max')
 
     # logger
-    logger = TensorBoardLogger("tensorboard_logs", name=config['run_id'])
+    logger = TensorBoardLogger("pretrained/tensorboard_logs", name=config['run_id'])
 
     # train
     trainer = L.Trainer(max_epochs=config['max_epochs'],
