@@ -17,24 +17,23 @@ import lightning as L
 
 
 
-class ViTForImageClassificationMultiChannel(ViTForImageClassification):
+class EncodeMultiChannel(nn.Module):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super().__init__()
         self.conv1 = nn.Conv2d(12, 32, kernel_size=(3,3), stride=1, padding=1)
         self.act1 = nn.ReLU()
         self.drop1 = nn.Dropout(0.3)
  
-        self.conv2 = nn.Conv2d(32, 32, kernel_size=(3,3), stride=1, padding=1)
+        self.conv2 = nn.Conv2d(32, 3, kernel_size=(3,3), stride=1, padding=1)
         self.act2 = nn.ReLU()
-        self.pool2 = nn.MaxPool2d(kernel_size=(2, 2))
+
+        # self.flat = nn.Flatten()
  
-        self.flat = nn.Flatten()
+        # self.fc3 = nn.Linear(401408, 512)
+        # self.act3 = nn.ReLU()
+        # self.drop3 = nn.Dropout(0.5)
  
-        self.fc3 = nn.Linear(8192, 512)
-        self.act3 = nn.ReLU()
-        self.drop3 = nn.Dropout(0.5)
- 
-        self.fc4 = nn.Linear(512, 10)
+        # self.fc4 = nn.Linear(512, 10)
         
  
     def forward(self, x):
@@ -42,20 +41,30 @@ class ViTForImageClassificationMultiChannel(ViTForImageClassification):
         x = self.act1(self.conv1(x))
         x = self.drop1(x)
         # input 32x32x32, output 32x32x32
-        x = self.act2(self.conv2(x))
-        # input 32x32x32, output 32x16x16
-        x = self.pool2(x)
+        return self.act2(self.conv2(x)) # torch.Size([1, 32, 224, 224])
+        # input 32x32x32, output 32x16x16 
+        # x = self.pool2(x) # torch.Size([1, 32, 112, 112])
+        # return self.conv3(x)
         # input 32x16x16, output 8192
-        x = self.flat(x)
-        # input 8192, output 512
-        x = self.act3(self.fc3(x))
-        x = self.drop3(x)
-        # input 512, output 10
-        x = self.fc4(x)
-        x = super().forward(x)
-        return x
+        # x = self.flat(x) # torch.Size([1, 401408])
+        # # input 8192, output 512
+        # x = self.act3(self.fc3(x))
+        # x = self.drop3(x)
+        # # input 512, output 10
+        # x = self.fc4(x)
+        
+        # return x
 
-
+class ViTForImageClassificationMultiChannel(L.LightningModule):
+    def __init__(self, num_classes, *args, **kwargs):
+        super().__init__()
+        self.encode = EncodeMultiChannel()
+        self.vit = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224", num_labels=num_classes, ignore_mismatched_sizes=True)
+  
+    def forward(self, x):
+        x = self.encode.forward(x)
+        return self.vit(x)
+    
 
 
 class VisionTransformerPretrained(L.LightningModule):
@@ -74,7 +83,7 @@ class VisionTransformerPretrained(L.LightningModule):
         super().__init__()
 
         if model == 'vit_b_16':
-            vit = ViTForImageClassificationMultiChannel.from_pretrained("google/vit-base-patch16-224", num_labels=num_classes, ignore_mismatched_sizes=True)
+            vit = ViTForImageClassificationMultiChannel(num_classes)
         else:
             raise ValueError(model)
 

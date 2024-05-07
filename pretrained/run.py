@@ -84,7 +84,7 @@ def main(arg):
     print('Finished model test')
     from datetime import datetime
     execution_start = datetime.now().strftime("%m%d%Y-%H%M%S")
-    trainer.save_checkpoint({execution_start}.chkpt)
+    trainer.save_checkpoint(f"final_checkpoint/{execution_start}.chkpt")
 
 if __name__=='__main__':
     main(sys.argv[1:])
