@@ -82,6 +82,9 @@ def main(arg):
     print('Starting model test')
     trainer.test(model=model, dataloaders=test_dataloader, verbose=True)
     print('Finished model test')
+    from datetime import datetime
+    execution_start = datetime.now().strftime("%m%d%Y-%H%M%S")
+    trainer.save_checkpoint({execution_start}.chkpt)
 
 if __name__=='__main__':
     main(sys.argv[1:])
