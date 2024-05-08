@@ -77,8 +77,8 @@ train_transforms  = transforms.Compose([
     v2.RandomResizedCrop(224),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
-    # wiggle_them_bands,
-    color_jitter,
+    wiggle_them_bands,
+    # color_jitter,
     transforms.GaussianBlur(1),
 ])
 test_transforms  = transforms.Compose([
