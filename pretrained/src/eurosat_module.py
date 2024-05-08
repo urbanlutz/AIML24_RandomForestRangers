@@ -55,6 +55,13 @@ test_std = [115.1743, 209.1482, 241.2069, 301.1053, 269.5137, 420.2494, 503.8187
 # test_std = [301.1053,241.2069, 209.1482]
 
 
+def wiggle_them_bands(x):
+    num_bands = x.shape[0]
+
+    for i in range(num_bands):
+        x[i] = transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1))(x[i].unsqueeze(0))
+    return x
+
 def color_jitter(x):
     # jitter rgb bands only (order doesn't matter)
     pre = x[0, :, :].unsqueeze(0)
@@ -67,9 +74,10 @@ train_transforms  = transforms.Compose([
     # bandselect,
     v2.ToImage(),
     v2.Resize(size=(224,224), interpolation=2, antialias=True),
+    v2.RandomResizedCrop(224)
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
-    color_jitter,
+    wiggle_them_bands,
     transforms.GaussianBlur(1),
 ])
 test_transforms  = transforms.Compose([
