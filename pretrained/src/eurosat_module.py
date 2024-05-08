@@ -74,7 +74,7 @@ train_transforms  = transforms.Compose([
     # bandselect,
     v2.ToImage(),
     v2.Resize(size=(224,224), interpolation=2, antialias=True),
-    v2.RandomResizedCrop(224)
+    v2.RandomResizedCrop(224),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
     wiggle_them_bands,
