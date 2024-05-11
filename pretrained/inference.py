@@ -52,7 +52,7 @@ trainer = L.Trainer( max_epochs=config['max_epochs'],
                         logger=logger,
                         enable_progress_bar=True)
 
-chkpt_path = "pretrained/tensorboard_logs/alpha/version_36/checkpoints/epoch=7-step=1576.ckpt"
+chkpt_path = "pretrained/tensorboard_logs/alpha/version_55/checkpoints/epoch=19-step=3940.ckpt"
 
 # trainer.fit(model, ckpt_path=chkpt_path)
 

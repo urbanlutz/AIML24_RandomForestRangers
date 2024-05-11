@@ -13,7 +13,7 @@ from lightning.pytorch.loggers import TensorBoardLogger
 
 sys.path.append('./pretrained/src/')
 from country211_module import Country211DataModule
-from eurosat_module import EuroSAT_RGB_DataModule
+from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
 from vision_transformer import VisionTransformerPretrained
 
 import utils
@@ -84,7 +84,39 @@ def main(arg):
     print('Finished model test')
     from datetime import datetime
     execution_start = datetime.now().strftime("%m%d%Y-%H%M%S")
-    trainer.save_checkpoint(f"final_checkpoint/{execution_start}.chkpt")
+    trainer.save_checkpoint(f"final_checkpoint/version_{logger.version}-{execution_start}.chkpt")
+
+
+    test_dataset = SentinelTest(config["test_data_path"], 2)
+    test_dataloader = test_dataset.test_dataloader()
+    preds = trainer.predict(model=model, dataloaders=test_dataloader)
+
+    
+    labels2ids = datamodule.train_data.dataset.class_to_idx
+    ids2labels = {v: k for k, v in labels2ids.items()}
+    
+    
+    def oh2text(one_hot):
+        idx = torch.argmax(one_hot).item()
+        return ids2labels[idx]
+    
+    
+    
+    
+    import torch
+    
+    class_array = []
+    for pred, idx in preds:
+        class_array = [*class_array, *[( idx[i], oh2text(pred.loss['logits'][i]))for i in range(pred.loss['logits'].shape[0])]]
+    
+    import csv
+    with open(f'results/version_{logger.version}-{execution_start}.csv', 'w', newline='') as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(['test_id', 'label'])
+    
+        # Write each string to a row with its corresponding index as the test_id
+        for i, label in class_array:
+            writer.writerow([i, label])
 
 if __name__=='__main__':
     main(sys.argv[1:])

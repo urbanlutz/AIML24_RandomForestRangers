@@ -59,7 +59,7 @@ def wiggle_them_bands(x):
     num_bands = x.shape[0]
 
     for i in range(num_bands):
-        x[i] = transforms.ColorJitter(brightness=(0.5,1.5),contrast=(1),saturation=(0.5,1.5),hue=(-0.1,0.1))(x[i].unsqueeze(0))
+        x[i] = transforms.ColorJitter(brightness=(0.2,1.2),contrast=(1),saturation=(0.2,1.2),hue=(-0.1,0.1))(x[i].unsqueeze(0))
     return x
 
 def color_jitter(x):
@@ -74,10 +74,11 @@ train_transforms  = transforms.Compose([
     # bandselect,
     v2.ToImage(),
     v2.Resize(size=(224,224), interpolation=2, antialias=True),
-    v2.RandomResizedCrop(224)
+    v2.RandomResizedCrop(224),
     v2.ToDtype(torch.float32, scale=True),
     v2.Normalize(test_mean, test_std),
     wiggle_them_bands,
+    # color_jitter,
     transforms.GaussianBlur(1),
 ])
 test_transforms  = transforms.Compose([
