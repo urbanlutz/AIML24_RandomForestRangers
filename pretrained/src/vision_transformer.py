@@ -9,31 +9,30 @@ from transformers import ViTForImageClassification
 import torchmetrics
 
 sys.path.append('./src/')
-from country211_module import Country211DataModule
-from eurosat_module import EuroSAT_RGB_DataModule, SentinelTest
+from eurosat_module import SentinelTest
 
 
 import lightning as L
 
+
+# TODO: Implement train/restore for Autoencoder to use it as an encoder
 class AutoEncoder(nn.Module):
     def __init__(self, *args, **kwargs):
         super().__init__()
         self.encoder = nn.Sequential([
-        nn.Conv2d(12, 32, kernel_size=(3,3), stride=1, padding=1),
-        nn.ReLU(),
-        nn.Dropout(0.3),
- 
-        nn.Conv2d(32, 3, kernel_size=(3,3), stride=1, padding=1),
-        nn.ReLU(),
+            nn.Conv2d(12, 32, kernel_size=(3,3), stride=1, padding=1),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Conv2d(32, 3, kernel_size=(3,3), stride=1, padding=1),
+            nn.ReLU(),
         ])
 
         self.decoder = nn.Sequential([
-        nn.Conv2d(3, 32, kernel_size=(3,3), stride=1, padding=1),
-        nn.ReLU(),
-        nn.Dropout(0.3),
- 
-        nn.Conv2d(32, 12, kernel_size=(3,3), stride=1, padding=1),
-        nn.ReLU(),
+            nn.Conv2d(3, 32, kernel_size=(3,3), stride=1, padding=1),
+            nn.ReLU(),
+            nn.Dropout(0.3),
+            nn.Conv2d(32, 12, kernel_size=(3,3), stride=1, padding=1),
+            nn.ReLU(),
         ])
 
     def forward(self, x):
@@ -48,22 +47,19 @@ class EncodeMultiChannel(nn.Module):
         self.conv1 = nn.Conv2d(12, 32, kernel_size=(3,3), stride=1, padding=1)
         self.act1 = nn.ReLU()
         self.drop1 = nn.Dropout(0.3)
- 
         self.conv2 = nn.Conv2d(32, 3, kernel_size=(3,3), stride=1, padding=1)
         self.act2 = nn.ReLU()
         
  
     def forward(self, x):
-        # input 3x32x32, output 32x32x32
         x = self.act1(self.conv1(x))
         x = self.drop1(x)
-        # input 32x32x32, output 32x32x32
-        return self.act2(self.conv2(x)) # torch.Size([1, 32, 224, 224])
+        return self.act2(self.conv2(x))
 
 class ViTForImageClassificationMultiChannelAuto(L.LightningModule):
-    def __init__(self, auto_encoder: AutoEncoder, num_classes, *args, **kwargs):
+    def __init__(self, num_classes, *args, **kwargs):
         super().__init__()
-        self.encode = auto_encoder.encoder
+        self.encode = EncodeMultiChannel()
         self.vit = ViTForImageClassification.from_pretrained("google/vit-base-patch16-224", num_labels=num_classes, ignore_mismatched_sizes=True)
   
     def forward(self, x):
