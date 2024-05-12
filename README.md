@@ -4,7 +4,7 @@
 In this challenge, we try to predict land-cover classes for patches of multi-spectral satellite imagery with deep neural networks!
 
 ## Installation
-List any libraries or tools that need to be installed to run the code. The list could be find in the [requirements.txt](./requirements.txt) file.
+The list of the libraries which should be installed to run the pretrained Transformer could be found in the [requirements.txt](./requirements.txt) file.
 
 ## DataSet Description
 
@@ -27,6 +27,8 @@ File: [Resnet12_v2](./ResNet12_v2.ipynb)
 As a first step, we set up the basis of the coding challenge with a simple ResNet12, initially focusing on data loading, 
 data transforming, differentiating between train, validation and test loop, and implementing the submission.
 
+To run the code, we just need to run the python notebook.
+
 
 ### 2. Vision Transformer (ViT)
 In the next step, we took the basis of the ResNet12 code, exchanged the model and replaced it with a VisionTransformer.
@@ -36,25 +38,35 @@ File: [ViT_v2](./ViT_v2.ipynb)
 FineTuning was done with various tests with different parameters:
 
 - learning rate
+- epoch
+- cross-validation
 - batch size
 - etc.
 
+To run the code, we just need to run the python notebook.
+The test metrics will be printed during the run.
+
 ### 3. Pretrained Vision Transformer
 
- TODO: here noch lightning und git repo als vorlage und wie die run, config, und das ganze zusammenspiel
+For the last step in the coding challenge, we have used a pretrained Vision Transformer as a base for our model from this github repository (https://github.com/crlna16/pretrained-vision-transformer/)
+
+Additional to the previous two developments we used the pytorch lightning library.
 
 Folder: [pretrained](./pretrained)
 
 The config of the pretrained vision transformer could be found here: [default.yaml](./pretrained/configs/default.yaml)
-
 The python application could be found here: [run.py](./pretrained/run.py)
+Our transform operations on the data is defined in the [eurosat_module.py](./pretrained/src/eurosat_module.py)
+The different steps of the model are defined in the [vision_transformer.py](./pretrained/src/vision_transformer.py)
 
+To run the model we could simply run the [run.py](./pretrained/run.py). The needed configs for the model will imported at the beginning of the application.
+
+For the visualization of the test-loss, validation_loss, accuracy we used the visualization suite: tensorboard.
 
 ## Results
 All .csv files could be found in the results folder [results](./results)
 
-## Conclusion
-Provide insights into the overall findings, learnings from the project, and any potential future work or improvements that could be made.
+
 
 
 

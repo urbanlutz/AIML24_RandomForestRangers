@@ -5,9 +5,26 @@ test_data_path: ./drive/MyDrive/AIML24/testset/testset/testset
 batch_size : 32
 model : vit_b_16
 run_id : alpha
-early_stopping_patience : 5
+early_stopping_patience : 5 # Number of epochs to continue training without improvement in validation loss before stopping early to prevent overfitting.
 devices : 4
 learning_rate : 0.0001
 max_epochs : 1000 # Lightning default
-valid_size : 2700
-num_nodes : 1
+valid_size : 2700 # Number of samples in the validation set, used to evaluate the model performance during training.
+num_nodes : 1 # Number of computing nodes used for the training, typically 1 unless using a distributed system.
+
+
+# Configuration for training a vision transformer on remote sensing data
+
+data_root = './drive/MyDrive/AIML24/remote_sensing/otherDatasets/sentinel_2/tif'  # Root directory for the dataset, pointing to where Sentinel-2 TIFF files are stored on Google Drive.
+data_set = 'tif'  # Format of the dataset files, which is TIFF in this case.
+train_data_path = './drive/MyDrive/AIML24/remote_sensing/otherDatasets/sentinel_2/tif'  # Path to the training data, a subset of the data_root specifically set aside for training the model.
+test_data_path = './drive/MyDrive/AIML24/testset/testset/testset'  # Path to the test data, used to evaluate the model after training on unseen data.
+batch_size = 32  # Number of samples in each batch to be passed through the network before an update to the model parameters is made.
+model = 'vit_b_16'  # Specifies the model to use, which is 'Vision Transformer B-16' in this case.
+run_id = 'alpha'  # Identifier for the run, can be used to track different experiments or model training sessions.
+early_stopping_patience = 5  # Number of epochs to continue training without improvement in validation loss before stopping early to prevent overfitting.
+devices = 4  # Number of devices (e.g., GPUs) to be used for training.
+learning_rate = 0.0001  # Initial learning rate for the optimizer.
+max_epochs = 1000  # Maximum number of epochs to train, though training may stop earlier due to early stopping.
+valid_size = 2700  # Number of samples in the validation set, used to evaluate the model performance during training.
+num_nodes = 1  # Number of computing nodes used for the training, typically 1 unless using a distributed system.
